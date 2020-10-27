@@ -1,0 +1,9 @@
+SELECT customers.name, orders.price
+FROM customers
+         LEFT JOIN orders
+                   ON customers.order_id = orders.id
+WHERE order_date <= (SELECT MIN(order_date) FROM orders) + interval '10 year'
+  AND price = (SELECT MAX(price)
+                FROM orders
+                WHERE order_date < (SELECT MIN(order_date) FROM orders) + interval '10 year');
+

@@ -1,0 +1,35 @@
+-- we don't know how to generate root <with-no-name> (class Root) :(
+create table customers
+(
+    id varchar,
+    name varchar,
+    order_id varchar
+);
+
+alter table customers owner to postgres;
+
+create table orders
+(
+    id varchar,
+    price integer,
+    order_date date
+);
+
+alter table orders owner to postgres;
+
+create function totalrecords() returns date
+    language plpgsql
+as $$
+declare
+    total date;
+oldest_order date;
+BEGIN
+    --    SELECT count(*) into total FROM COMPANY;
+-- 	oldest_order = (SELECT order_date FROM orders ORDER BY order_date LIMIT 1) + interval '1 year';
+    total = (SELECT order_date FROM orders ORDER BY order_date LIMIT 3) + interval '1 year';
+RETURN total;
+END;
+$$;
+
+alter function totalrecords() owner to postgres;
+

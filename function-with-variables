@@ -1,0 +1,34 @@
+DROP FUNCTION totalrecords();
+CREATE OR REPLACE FUNCTION totalRecords()
+    RETURNS TABLE
+            (
+                user_name     varchar,
+                highest_price integer
+            )
+    LANGUAGE plpgsql
+AS
+$$
+declare
+
+    max_order_date           date;
+    min_order_date           date;
+    max_order_price_in_range integer;
+BEGIN
+    --    SELECT count(*) into total FROM COMPANY;
+    min_order_date = (SELECT MIN(order_date) FROM orders);
+    max_order_date = min_order_date + interval '10 year';
+    max_order_price_in_range =
+            (SELECT MAX(price) FROM orders WHERE order_date BETWEEN min_order_date AND max_order_date);
+
+    RETURN QUERY (SELECT customers.name, orders.price
+                  FROM customers
+                           LEFT JOIN orders
+                                     ON customers.order_id = orders.id
+                  WHERE order_date <= max_order_date
+                    AND price > max_order_price_in_range);
+
+END;
+$$;
+
+-- function invocation select functionname();
+select totalRecords();
